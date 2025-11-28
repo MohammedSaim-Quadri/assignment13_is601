@@ -1,264 +1,114 @@
-# 📦 Project Setup
+# IS601 Module 13: JWT Authentication & E2E Testing
+
+This project implements a FastAPI-based calculation application with **JWT (JSON Web Token) authentication**. It includes a full front-end interface for user registration and login, along with automated End-to-End (E2E) testing using **Playwright**.
 
 ---
 
-# 🧩 1. Install Homebrew (Mac Only)
+## Docker Hub Repository
 
-> Skip this step if you're on Windows.
-
-Homebrew is a package manager for macOS.  
-You’ll use it to easily install Git, Python, Docker, etc.
-
-**Install Homebrew:**
-
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-**Verify Homebrew:**
-
-```bash
-brew --version
-```
-
-If you see a version number, you're good to go.
+**[Link to Docker Hub Repository](https://hub.docker.com/r/saimquadri/601_module13)**
 
 ---
 
-# 🧩 2. Install and Configure Git
+## Features Implemented
 
-## Install Git
+### 1. JWT Authentication (Back-End)
+- [cite_start]**`/register` Endpoint:** Hashes passwords using bcrypt, validates user data with Pydantic, checks for duplicates, and stores users in PostgreSQL[cite: 57, 122].
+- [cite_start]**`/login` Endpoint:** Validates credentials and returns a JWT access token upon success[cite: 58, 126].
+- **Security:** Protected routes require a valid Bearer token in the header.
 
-- **MacOS (using Homebrew)**
+### 2. Front-End Interface
+- [cite_start]**Register Page (`register.html`):** Client-side validation for email format and password complexity (min length, special chars)[cite: 278, 290].
+- [cite_start]**Login Page (`login.html`):** secure login form that stores the JWT in `localStorage` upon success[cite: 254, 265].
+- [cite_start]**Dashboard:** A protected area that requires authentication to view[cite: 200].
 
-```bash
-brew install git
-```
-
-- **Windows**
-
-Download and install [Git for Windows](https://git-scm.com/download/win).  
-Accept the default options during installation.
-
-**Verify Git:**
-
-```bash
-git --version
-```
+### 3. Automated Testing & CI/CD
+- [cite_start]**Playwright E2E Tests:** Automated browser testing for positive (successful login/register) and negative (invalid input) scenarios[cite: 322, 327].
+- [cite_start]**CI/CD Pipeline:** GitHub Actions workflow that spins up a database, runs tests, and pushes the image to Docker Hub on success[cite: 464, 471].
 
 ---
 
-## Configure Git Globals
+## Project Setup
 
-Set your name and email so Git tracks your commits properly:
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "your_email@example.com"
-```
-
-Confirm the settings:
-
-```bash
-git config --list
-```
-
----
-
-## Generate SSH Keys and Connect to GitHub
-
-> Only do this once per machine.
-
-1. Generate a new SSH key:
-
-```bash
-ssh-keygen -t ed25519 -C "your_email@example.com"
-```
-
-(Press Enter at all prompts.)
-
-2. Start the SSH agent:
-
-```bash
-eval "$(ssh-agent -s)"
-```
-
-3. Add the SSH private key to the agent:
-
-```bash
-ssh-add ~/.ssh/id_ed25519
-```
-
-4. Copy your SSH public key:
-
-- **Mac/Linux:**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | pbcopy
-```
-
-- **Windows (Git Bash):**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | clip
-```
-
-5. Add the key to your GitHub account:
-   - Go to [GitHub SSH Settings](https://github.com/settings/keys)
-   - Click **New SSH Key**, paste the key, save.
-
-6. Test the connection:
-
-```bash
-ssh -T git@github.com
-```
-
-You should see a success message.
-
----
-
-# 🧩 3. Clone the Repository
-
-Now you can safely clone the course project:
-
+### 1. Clone and Configure
 ```bash
 git clone <repository-url>
 cd <repository-directory>
 ```
 
----
-
-# 🛠️ 4. Install Python 3.10+
-
-## Install Python
-
-- **MacOS (Homebrew)**
+### 2. Environment Setup (Python)
+Ensure you have Python 3.10+ installed.
 
 ```bash
-brew install python
-```
 
-- **Windows**
-
-Download and install [Python for Windows](https://www.python.org/downloads/).  
-✅ Make sure you **check the box** `Add Python to PATH` during setup.
-
-**Verify Python:**
-
-```bash
-python3 --version
-```
-or
-```bash
-python --version
-```
-
----
-
-## Create and Activate a Virtual Environment
-
-(Optional but recommended)
-
-```bash
+# Create virtual environment
 python3 -m venv venv
+
+# Activate environment
 source venv/bin/activate   # Mac/Linux
 venv\Scripts\activate.bat  # Windows
-```
 
-### Install Required Packages
-
-```bash
+# Install dependencies
 pip install -r requirements.txt
 ```
 
----
-
-# 🐳 5. (Optional) Docker Setup
-
-> Skip if Docker isn't used in this module.
-
-## Install Docker
-
-- [Install Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/)
-- [Install Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-
-## Build Docker Image
+### 3. Install Playwright Browsers
+Required for running E2E tests.
 
 ```bash
-docker build -t <image-name> .
+playwright install
 ```
 
-## Run Docker Container
+### 4. Database Setup
+Ensure you have a PostgreSQL database running. You can use Docker Compose:
 
 ```bash
-docker run -it --rm <image-name>
+docker-compose up -d
 ```
+Update your .env file or environment variables to match your DB credentials.
 
----
+## Running the Application
+To run the application locally with the front-end:
 
-# 🚀 6. Running the Project
-
-- **Without Docker**:
+Start the Server:
 
 ```bash
-python main.py
+uvicorn app.main:app --reload
+Access the Front-End: Open your browser and navigate to:
+
+Home: http://127.0.0.1:8000/
+
+Login: http://127.0.0.1:8000/login
+
+Register: http://127.0.0.1:8000/register
+
+Dashboard: http://127.0.0.1:8000/dashboard
 ```
-
-(or update this if the main script is different.)
-
-- **With Docker**:
+## Running Tests
+### 1. Run All Tests (Unit + Integration + E2E)
+```bash
+pytest
+```
+### 2. Run Only E2E (Playwright) Tests
+To specifically test the UI flows (Login/Register validation):
 
 ```bash
-docker run -it --rm <image-name>
+
+pytest tests/e2e
 ```
+Note: Ensure the server is running or the test fixture is configured to spin up the TestClient correctly.
 
----
-
-# 📝 7. Submission Instructions
-
-After finishing your work:
-
+### 3. Run Only Unit/Integration Tests
 ```bash
-git add .
-git commit -m "Complete Module X"
-git push origin main
+
+pytest tests/unit tests/integration
 ```
 
-Then submit the GitHub repository link as instructed.
+## CI/CD Pipeline
+This repository uses GitHub Actions for Continuous Integration and Deployment.
 
----
+- Trigger: Pushes to the main branch.
 
-# 🔥 Useful Commands Cheat Sheet
+- Test: Sets up Python, installs dependencies (including Playwright), runs all tests against a service container database.
 
-| Action                         | Command                                          |
-| ------------------------------- | ------------------------------------------------ |
-| Install Homebrew (Mac)          | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
-| Install Git                     | `brew install git` or Git for Windows installer |
-| Configure Git Global Username  | `git config --global user.name "Your Name"`      |
-| Configure Git Global Email     | `git config --global user.email "you@example.com"` |
-| Clone Repository                | `git clone <repo-url>`                          |
-| Create Virtual Environment     | `python3 -m venv venv`                           |
-| Activate Virtual Environment   | `source venv/bin/activate` / `venv\Scripts\activate.bat` |
-| Install Python Packages        | `pip install -r requirements.txt`               |
-| Build Docker Image              | `docker build -t <image-name> .`                |
-| Run Docker Container            | `docker run -it --rm <image-name>`               |
-| Push Code to GitHub             | `git add . && git commit -m "message" && git push` |
-
----
-
-# 📋 Notes
-
-- Install **Homebrew** first on Mac.
-- Install and configure **Git** and **SSH** before cloning.
-- Use **Python 3.10+** and **virtual environments** for Python projects.
-- **Docker** is optional depending on the project.
-
----
-
-# 📎 Quick Links
-
-- [Homebrew](https://brew.sh/)
-- [Git Downloads](https://git-scm.com/downloads)
-- [Python Downloads](https://www.python.org/downloads/)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [GitHub SSH Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+- Deploy: If tests pass, builds the Docker image and pushes it to Docker Hub
